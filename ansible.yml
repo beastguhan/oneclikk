@@ -1,0 +1,36 @@
+---
+- name: Deploy Full DevOps Stack
+  hosts: all
+  become: yes
+  tasks:
+    - name: Install Prerequisites
+      apt:
+        name: [curl, GnuPG, openjdk-11-jdk, docker.io]
+        state: present
+        update_cache: yes
+
+    - name: Install Jenkins
+      shell: |
+        curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key | sudo tee /usr/share/keyrings/jenkins-keyring.asc > /dev/null
+        echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian-stable binary/ | sudo tee /etc/apt/sources.list.d/jenkins.list > /dev/null
+        apt-get update && apt-get install -y jenkins
+        systemctl start jenkins
+
+    - name: Install K3s (Lightweight Kubernetes)
+      shell: curl -sfL https://get.k3s.io | sh -
+      args:
+        creates: /usr/local/bin/k3s
+
+    - name: Install Helm
+      shell: curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+    - name: Deploy Prometheus and Grafana via Helm
+      shell: |
+        export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
+        chmod 644 /etc/rancher/k3s/k3s.yaml
+        helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+        helm repo update
+        helm install monitoring prometheus-community/kube-prometheus-stack \
+          --namespace monitoring --create-namespace \
+          --set grafana.service.type=NodePort \
+          --set prometheus.service.type=NodePort
