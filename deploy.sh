@@ -9,7 +9,7 @@ IP=$(terraform output -raw instance_ip)
 
 echo "🛠️ Step 2: Creating Dynamic Inventory..."
 echo "[devops_nodes]" > inventory.ini
-echo "$IP ansible_ssh_private_key_file=~/path/to/your-key.pem" >> inventory.ini # <--- CHANGE THIS PATH
+echo "$IP ansible_ssh_private_key_file=~/downloads/jen.pem" >> inventory.ini # <--- CHANGE THIS PATH
 
 echo "⏳ Step 3: Waiting 60 seconds for Instance to initialize..."
 sleep 60
