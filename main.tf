@@ -28,7 +28,7 @@ resource "aws_security_group" "devops_sg" {
 resource "aws_instance" "devops_node" {
   ami           = "ami-0c7217cdde317cfec" # Ubuntu 22.04 LTS
   instance_type = "t3.large" 
-  key_name      = "your-key-pair-name" # <--- CHANGE THIS
+  key_name      = "jen" # <--- CHANGE THIS
   vpc_security_group_ids = [aws_security_group.devops_sg.id]
 
   tags = { Name = "DevOps-Master-Node" }
